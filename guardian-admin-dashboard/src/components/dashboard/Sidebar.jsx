@@ -47,9 +47,7 @@ export default function Sidebar({
   const navigate = useNavigate();
 
   const role = getAdminUser()?.role;
-  const visibleItems = ADMIN_NAV_ITEMS.filter((item) =>
-    item.roles.includes(role),
-  );
+  const visibleItems = ADMIN_NAV_ITEMS.filter((item) => item.roles?.includes(role));
 
   const handleLogout = () => {
     clearAuthStorage();
