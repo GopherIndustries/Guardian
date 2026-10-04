@@ -18,6 +18,17 @@ plugins {
     id "com.diffplug.spotless" version "6.23.3"
 }
 
+// Backend URL: release builds always use the deployed backend.
+// Debug builds use "api.base.url" from local.properties if set (e.g. a local Docker backend),
+// otherwise the deployed backend.
+def PROD_API_BASE_URL = "https://guardian-backend-jade.vercel.app/api/v1/"
+def localProps = new Properties()
+def localPropsFile = rootProject.file("local.properties")
+if (localPropsFile.exists()) {
+    localPropsFile.withInputStream { localProps.load(it) }
+}
+def debugApiBaseUrl = localProps.getProperty("api.base.url", PROD_API_BASE_URL)
+
 android {
     compileSdk 34
 
@@ -29,12 +40,17 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField "String", "API_BASE_URL", "\"${PROD_API_BASE_URL}\""
+
         vectorDrawables {
             useSupportLibrary true
         }
     }
 
     buildTypes {
+        debug {
+            buildConfigField "String", "API_BASE_URL", "\"${debugApiBaseUrl}\""
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -48,6 +64,7 @@ android {
         viewBinding true
 //        dataBinding true
         compose true
+        buildConfig true
     }
     namespace 'deakin.gopher.guardian'
     kotlinOptions {

@@ -1,6 +1,7 @@
 package deakin.gopher.guardian.services.api
 
 import com.google.gson.GsonBuilder
+import deakin.gopher.guardian.BuildConfig
 import deakin.gopher.guardian.model.register.User
 import deakin.gopher.guardian.model.register.UserDeserializer
 import okhttp3.OkHttpClient
@@ -9,11 +10,9 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-//    private const val BASE_URL = "http://10.0.2.2:3000/api/v1/"
-
-    private const val BASE_URL = "https://the-real-guardian-backend.vercel.app/api/v1/"
-
-//  private const val BASE_URL = "https://guardian-backend-git-fix-cors-patelrudra2306-5873s-projects.vercel.app/api/v1/"
+    // Set in app/build.gradle. Release: deployed backend.
+    // Debug: "api.base.url" in local.properties, or the deployed backend if not set.
+    private val BASE_URL = BuildConfig.API_BASE_URL
 
     private val gson =
         GsonBuilder()
@@ -24,7 +23,7 @@ object RetrofitClient {
     private val client = OkHttpClient()
     private val interceptor =
         HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
+            level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
             redactHeader("Authorization")
         }
     private val clientBuilder = client.newBuilder().addInterceptor(interceptor)
